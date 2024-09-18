@@ -1,0 +1,29 @@
+<textarea id="code">return "hi";</textarea>
+<button id="button">Run</button>
+<pre id="output"></pre>
+
+<script>
+    // Get references to the elements
+    const codeField = document.getElementById("code");
+    const runButton = document.getElementById("button");
+    const output = document.getElementById("output");
+
+    // Add event listener to the button
+    runButton.addEventListener("click", () => {
+        let result;
+        try {
+            // Create and call the function
+            const userFunction = new Function(codeField.value);
+            result = userFunction();
+        } catch (error) {
+            // Catch any errors and set result to the error message
+            result = error.toString();
+        }
+        // Append the result to the output area
+        const resultNode = document.createTextNode(result + "\n");
+        output.appendChild(resultNode);
+    });
+</script>
+<!--A <textarea> for entering JavaScript code.
+A <button> to execute the code.
+A <pre> element to display the output.-->

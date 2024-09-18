@@ -1,0 +1,98 @@
+<div id="grid"></div>
+<button id="next">Next generation</button>
+
+<script>
+        // Define grid dimensions
+        const width = 20;
+        const height = 20;
+        // Create the initial grid
+        let grid = createGrid(width, height);
+        const gridContainer = document.getElementById("grid");
+        // Initialize the grid with checkboxes
+        function initializeGrid() {
+            gridContainer.style.gridTemplateColumns = `repeat(${width}, 20px)`;
+            gridContainer.innerHTML = ""; // Clear the grid
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const checkbox = document.createElement("input");
+                    checkbox.type = "checkbox";
+                    checkbox.checked = Math.random() < 0.3; // Randomly populate cells
+                    checkbox.dataset.x = x;
+                    checkbox.dataset.y = y;
+                    gridContainer.appendChild(checkbox);
+
+                    // Update the grid array to match the checkbox state
+                    grid[y * width + x] = checkbox.checked;
+                }
+            }
+        }
+        // Create a grid array of given dimensions
+        function createGrid(width, height) {
+            return new Array(width * height).fill(false);
+        }
+        // Count live neighbors for a cell
+        function countLiveNeighbors(grid, x, y) {
+            let count = 0;
+            for (let dy = -1; dy <= 1; dy++) {
+                for (let dx = -1; dx <= 1; dx++) {
+                    if (dx === 0 && dy === 0) continue; // Ignore the cell itself
+                    const nx = x + dx;
+                    const ny = y + dy;
+                    if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                        count += grid[ny * width + nx] ? 1 : 0;
+                    }
+                }
+            }
+            return count;
+        }
+        // Compute the next generation
+        function computeNextGeneration(grid) {
+            const newGrid = createGrid(width, height);
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const liveNeighbors = countLiveNeighbors(grid, x, y);
+                    const isAlive = grid[y * width + x];
+                    // Apply the rules of the Game of Life
+                    if (isAlive) {
+                        newGrid[y * width + x] = liveNeighbors === 2 || liveNeighbors === 3;
+                    } else {
+                        newGrid[y * width + x] = liveNeighbors === 3;
+                    }
+                }
+            }
+            return newGrid;
+        }
+        // Update the DOM to reflect the new grid state
+        function updateDOMGrid(newGrid) {
+            const checkboxes = gridContainer.querySelectorAll("input[type='checkbox']");
+            checkboxes.forEach((checkbox, index) => {
+                checkbox.checked = newGrid[index];
+            });
+        }
+        // Get the current grid state from the DOM
+        function getCurrentGrid() {
+            const checkboxes = gridContainer.querySelectorAll("input[type='checkbox']");
+            const newGrid = createGrid(width, height);
+            checkboxes.forEach((checkbox, index) => {
+                newGrid[index] = checkbox.checked;
+            });
+            return newGrid;
+        }
+        // Advance to the next generation
+        document.getElementById("next").addEventListener("click", () => {
+            const currentGrid = getCurrentGrid();
+            const nextGrid = computeNextGeneration(currentGrid);
+            updateDOMGrid(nextGrid);
+        });
+        // Initialize the game
+        initializeGrid();
+</script>
+<!--Explanation:
+1.Grid Dimensions: Set the width and height of the grid.
+2.Grid Initialization: The initializeGrid function populates the grid with checkboxes and uses Math.random() to randomly set some cells as alive (checked).
+3.Create Grid: The createGrid function returns a 1D array representing the grid.
+4.Count Live Neighbors: The countLiveNeighbors function counts the number of live neighbors for a given cell, taking care to avoid the edges.
+5.Compute Next Generation: The computeNextGeneration function applies the rules of the Game of Life to compute the next generation and returns a new grid array.
+6.Update DOM: The updateDOMGrid function updates the checkboxes' states in the DOM to reflect the new grid state.
+7.Get Current Grid State: The getCurrentGrid function reads the current state of the grid from the checkboxes.
+8.Advance Generation: The "Next generation" button triggers an event that updates the grid to the next generation using the current state.  -->

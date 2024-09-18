@@ -1,0 +1,97 @@
+<!--Exercises--> 
+
+<!--Exercise1-->
+<script>
+//function to fetch and log the response
+async function fetchContent(mediaType) {
+    try {
+        let response=await fetch("https://eloquentjavascript.net/author", {
+      headers: { Accept: mediaType }
+    });
+    //Log the status and response content
+    consoe.log(`status: ${response.status}`)
+    console.log(`media type: ${mediaType}`)
+    console.log(`response: ${await response.text()}`)
+} catch (error) {
+    console.error(`Error fetching ${mediaType}:`,error)
+}
+}
+//fetch content in three formats
+fetchContent("text/plain");
+fetchContent("text/html")
+fetchContent("application/json")
+//try fetching bogus media type
+fetchContent("application/rainbow+unicorns")
+
+</script>
+
+
+
+
+<!--LocalStorage and Session Storage Concept-->
+<!--Local Storage:-
+                    1.Data stored in localStorage persists even after the browser is closed and reopened.
+                    2.Methods:
+                                localStorage.setItem(key, value): Stores a key-value pair.
+                                localStorage.getItem(key): Retrieves the value associated with the key.
+                                localStorage.removeItem(key): Removes the item associated with the key.
+-->
+<script>
+    localStorage.setItem("username","harry")
+    console.log(localStorage.getItem("username"));   //output is "harry"
+    localStorage.removeItem("username")
+  </script>
+  
+  <!--Session Storage:-
+                    1.Data stored in sessionStorage is cleared when the session ends (usually when the browser or tab is closed)
+                    2.Example:-Note-taking application:-
+  -->
+  Notes: <select></select> <button>Add</button><br>
+  <textarea style="width: 100%"></textarea>
+  <script>
+  let list = document.querySelector("select");
+  let note = document.querySelector("textarea");
+  let state;
+  //The setState function updates the application's state, modifies the DOM to reflect the current state, and stores the state in localStorage.
+  function setState(newState) {
+    list.textContent = "";
+    for (let name of Object.keys(newState.notes)) {
+      let option = document.createElement("option");
+      option.textContent = name;
+      if (newState.selected == name) option.selected = true;
+      list.appendChild(option);
+    }
+    note.value = newState.notes[newState.selected];
+  
+    localStorage.setItem("Notes", JSON.stringify(newState));
+    state = newState;
+  }
+  // Load existing notes from localStorage or initialize with a default note
+  setState(JSON.parse(localStorage.getItem("Notes")) ?? {
+    notes: {"shopping list": "Carrots\nRaisins"},
+    selected: "shopping list"
+  });
+  // Handle changing the selected note
+  list.addEventListener("change", () => {
+    setState({notes: state.notes, selected: list.value});
+  });
+  // Handle editing the current note
+  note.addEventListener("change", () => {
+    let {selected} = state;
+    setState({
+      notes: {...state.notes, [selected]: note.value},
+      selected
+    });
+  });
+  // Handle adding a new note
+  document.querySelector("button")
+    .addEventListener("click", () => {
+      let name = prompt("Note name");
+      if (name) setState({
+        notes: {...state.notes, [name]: ""},
+        selected: name
+      });
+    });
+  </script>
+  
+  
